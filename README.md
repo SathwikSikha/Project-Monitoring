@@ -253,5 +253,168 @@ To demonstrate the full capability of PAIMANA to hackathon evaluators:
 
 ---
 
+## 🚀 Deployment — Render + Vercel
+
+This section explains how to deploy PAIMANA as a live prototype with the **FastAPI backend on Render** and the **React frontend on Vercel**.
+
+### Architecture
+
+```
+User Browser
+     │
+     ▼
+Vercel (React SPA)
+     │  HTTPS calls to VITE_API_URL/api/*
+     ▼
+Render (FastAPI + SQLite + ML Models)
+     │
+     ├─ SQLite auto-seeds 18 projects on cold start
+     └─ RandomForest .pkl models loaded at startup
+```
+
+---
+
+### Prerequisites
+
+- GitHub account with PAIMANA repository
+- [Render](https://render.com) free account
+- [Vercel](https://vercel.com) free account
+
+---
+
+### Step 1 — Push to GitHub
+
+```bash
+git init                  # if not already a git repo
+git add .
+git commit -m "chore: prepare for Render + Vercel deployment"
+git remote add origin https://github.com/YOUR_USERNAME/paimana.git
+git branch -M main
+git push -u origin main
+```
+
+> **Important**: The `.pkl` ML model files (~40 MB total) are committed to git intentionally. They are required at runtime on Render. GitHub allows files up to 100 MB.
+
+---
+
+### Step 2 — Deploy Backend on Render
+
+1. Go to [render.com](https://render.com) → **New → Web Service**
+2. Connect your GitHub repository
+3. Configure the service:
+
+| Setting | Value |
+|---|---|
+| **Name** | `paimana-backend` |
+| **Root Directory** | *(leave blank — project root)* |
+| **Runtime** | `Python 3` |
+| **Build Command** | `pip install -r backend/requirements.txt` |
+| **Start Command** | `uvicorn backend.main:app --host 0.0.0.0 --port $PORT` |
+| **Plan** | Free |
+
+4. After creation, go to **Environment** tab and add:
+
+| Variable | Value |
+|---|---|
+| `FRONTEND_URL` | *(leave blank for now — add after Vercel deploy)* |
+
+5. Click **Deploy** and wait for the health check to pass at `/health`.
+6. Copy the Render URL (e.g., `https://paimana-backend.onrender.com`)
+
+> **Note**: On Render's free tier, the service spins down after 15 minutes of inactivity. The first request after a cold start may take 30–60 seconds while the server wakes up and ML models load.
+
+---
+
+### Step 3 — Deploy Frontend on Vercel
+
+1. Go to [vercel.com](https://vercel.com) → **New Project**
+2. Import your GitHub repository
+3. Configure the project:
+
+| Setting | Value |
+|---|---|
+| **Framework Preset** | `Vite` |
+| **Root Directory** | `frontend` |
+| **Build Command** | `npm run build` |
+| **Output Directory** | `dist` |
+
+4. Under **Environment Variables**, add:
+
+| Variable | Value |
+|---|---|
+| `VITE_API_URL` | `https://paimana-backend.onrender.com` *(your Render URL — no trailing slash)* |
+
+5. Click **Deploy**. Vercel will build and publish the frontend.
+6. Copy the Vercel URL (e.g., `https://paimana.vercel.app`)
+
+---
+
+### Step 4 — Connect Frontend ↔ Backend (CORS)
+
+1. Go back to your **Render backend** service
+2. Under **Environment** → update `FRONTEND_URL` to your Vercel URL:
+   ```
+   FRONTEND_URL=https://paimana.vercel.app
+   ```
+3. Render will automatically redeploy with the updated CORS setting.
+
+---
+
+### Step 5 — Verify the Live Deployment
+
+Test these URLs in your browser or with curl:
+
+```bash
+# Backend health
+curl https://paimana-backend.onrender.com/health
+# → {"status": "healthy", "service": "PAIMANA Backend API"}
+
+# Projects list
+curl https://paimana-backend.onrender.com/api/projects
+# → JSON array of 18 infrastructure projects
+
+# Dashboard stats
+curl https://paimana-backend.onrender.com/api/dashboard/stats
+# → {"total_projects": 18, "at_risk_count": ...}
+
+# ML Risk Analysis
+curl https://paimana-backend.onrender.com/api/projects/1/analysis
+# → {"risk_level": "CRITICAL", "confidence": 0.97, ...}
+
+# Frontend
+open https://paimana.vercel.app
+# → PAIMANA Dashboard should load and all features should work
+```
+
+---
+
+### Environment Variables Summary
+
+#### Render (Backend)
+
+| Variable | Required | Description |
+|---|---|---|
+| `FRONTEND_URL` | Recommended | Your Vercel frontend URL for CORS restriction. Leave blank to allow all origins. |
+| `PORT` | Auto-set | Injected by Render automatically. Do not set manually. |
+
+#### Vercel (Frontend)
+
+| Variable | Required | Description |
+|---|---|---|
+| `VITE_API_URL` | **Required** | Your Render backend root URL, e.g. `https://paimana-backend.onrender.com`. No trailing slash. |
+
+---
+
+### Deployment Limitations (Free Tier)
+
+| Limitation | Details |
+|---|---|
+| **Render cold starts** | Free tier services sleep after 15 min of inactivity. First request takes 30–60s. Upgrade to `Starter` (\$7/mo) for always-on. |
+| **SQLite on Render** | SQLite uses the container's ephemeral filesystem. Data written at runtime (e.g. marking alerts as read) is **lost on redeploy or restart**. The database is automatically re-seeded from `seed_data.py` on each cold start. For persistent writes, migrate to PostgreSQL (Render managed). |
+| **ML model load time** | The RandomForest models (~40 MB) take ~3–5 seconds to load on startup. This is a one-time cost per startup, not per request. |
+| **GitHub file size** | `.pkl` model files are committed to git. Combined size is ~40 MB, well within GitHub's 100 MB per-file limit. |
+
+---
+
 ## 🏆 Smart India Hackathon (SIH) 2026
 *Built by Team PAIMANA for National Infrastructure Monitoring & Decision Support.*

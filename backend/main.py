@@ -20,10 +20,19 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS for Vite frontend
+# CORS — in production, restrict to the deployed Vercel frontend URL.
+# Set FRONTEND_URL env var on Render to e.g. https://paimana.vercel.app
+# In dev (env var not set), allow all origins so local workflow is unaffected.
+_frontend_url = os.environ.get("FRONTEND_URL", "")
+_allowed_origins = (
+    [_frontend_url, "http://localhost:5173", "http://127.0.0.1:5173"]
+    if _frontend_url
+    else ["*"]
+)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -69,4 +78,6 @@ if __name__ == "__main__":
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if project_root not in sys.path:
         sys.path.insert(0, project_root)
-    uvicorn.run("backend.main:app", host="127.0.0.1", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=port, reload=False)
+

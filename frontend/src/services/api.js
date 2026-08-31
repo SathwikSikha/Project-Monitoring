@@ -1,9 +1,15 @@
 /**
  * PAIMANA Frontend API Service
  * Centralized API client communicating with FastAPI backend
+ *
+ * In development: uses Vite's proxy (VITE_API_URL is undefined → '/api')
+ * In production:  VITE_API_URL must be set to the Render backend root URL,
+ *                 e.g. https://paimana-backend.onrender.com
  */
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api';
 
 export const api = {
   // Dashboard Analytics

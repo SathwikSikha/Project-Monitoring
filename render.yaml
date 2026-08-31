@@ -1,0 +1,19 @@
+# render.yaml — PAIMANA Render deployment configuration
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: paimana-backend
+    runtime: python
+    plan: free                        # Change to 'starter' for always-on
+    rootDir: .                        # Project root (contains backend/ and ml/)
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: FRONTEND_URL
+        # Set this to your actual Vercel URL after deploying the frontend.
+        # Example: https://paimana.vercel.app
+        value: ""                     # Replace with your Vercel URL
+      - key: PYTHON_VERSION
+        value: "3.11.0"

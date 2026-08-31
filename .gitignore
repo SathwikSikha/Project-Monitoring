@@ -2,11 +2,20 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.env
 venv/
 .venv/
+
+# Environment variable files — keep .env.example files (they are documentation)
+.env
+.env.local
+.env.production
+
+# SQLite database — gitignored because Render auto-seeds on startup
 *.db
 *.sqlite3
+
+# NOTE: *.pkl ML model files are intentionally NOT gitignored.
+# They must be committed so Render can load them at runtime.
 
 # Node / React
 node_modules/
