@@ -123,6 +123,9 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
                 "timestamp": log.created_at.strftime("%Y-%m-%d %H:%M")
             })
 
+    # Recommended Intervention Priority ranking for all projects
+    intervention_priority = compute_intervention_priority(projects)
+
     return {
         "total_projects": total_projects,
         "on_track_count": on_track_count,
@@ -137,5 +140,83 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
         "progress_overview": progress_overview,
         "cost_vs_progress": cost_vs_progress,
         "projects_requiring_attention": attention_projects,
-        "recent_analyses": recent_analyses
+        "recent_analyses": recent_analyses,
+        "intervention_priority": intervention_priority
     }
+
+
+def compute_intervention_priority(projects: List[Project]) -> List[Dict[str, Any]]:
+    """
+    Calculates a transparent Priority Score and Intervention Order for all projects
+    based on risk level, projected delay, cost overrun, baseline progress lag, and contractor score.
+    """
+    def calc_score(p: Project):
+        risk_weights = {"CRITICAL": 40.0, "HIGH": 30.0, "MEDIUM": 18.0, "LOW": 5.0}
+        r_score = risk_weights.get(p.risk_level, 10.0)
+        delay_score = min(20.0, max(0.0, float(p.predicted_delay_months or 0.0) * 1.5))
+        cost_score = min(15.0, max(0.0, float(p.predicted_cost_overrun_percentage or 0.0) * 0.5))
+        lag = max(0.0, float(p.planned_progress or 0.0) - float(p.actual_progress or 0.0))
+        lag_score = min(15.0, lag * 0.5)
+        contractor_score = max(0.0, (100.0 - float(p.contractor_performance or 80.0)) * 0.10)
+        
+        raw_score = round(min(100.0, r_score + delay_score + cost_score + lag_score + contractor_score), 1)
+        return raw_score, lag
+
+    sorted_projects = sorted(projects, key=lambda x: (calc_score(x)[0], calc_score(x)[1]), reverse=True)
+
+    ranked_items = []
+    for rank, p in enumerate(sorted_projects, 1):
+        score, lag = calc_score(p)
+
+        if score >= 75.0 or p.risk_level == "CRITICAL":
+            priority_label = "Immediate Intervention"
+        elif score >= 55.0 or p.risk_level == "HIGH":
+            priority_label = "High Attention"
+        elif score >= 35.0 or p.risk_level == "MEDIUM":
+            priority_label = "Moderate Priority"
+        else:
+            priority_label = "Routine Monitoring"
+
+        delay_impact = "High" if (p.predicted_delay_months or 0) >= 6.0 or (p.delay_days or 0) >= 90 else ("Medium" if (p.predicted_delay_months or 0) >= 2.0 or (p.delay_days or 0) >= 30 else "Low")
+        cost_impact = "High" if (p.predicted_cost_overrun_percentage or 0) >= 15.0 or (p.project_cost or 0) >= 2000 else ("Medium" if (p.predicted_cost_overrun_percentage or 0) >= 5.0 else "Low")
+
+        if p.risk_level == "CRITICAL":
+            explanation = f"Critical risk level combined with {lag:.1f}% baseline lag and severe projected delay (+{p.predicted_delay_months:.1f}m)."
+        elif p.risk_level == "HIGH":
+            explanation = f"High risk level driven by {lag:.1f}% schedule slippage and contractor score ({p.contractor_performance:.0f}/100)."
+        elif p.risk_level == "MEDIUM":
+            explanation = f"Moderate progress variance (+{p.predicted_delay_months:.1f}m delay) requiring focused supply chain oversight."
+        else:
+            explanation = f"On-track execution ({p.actual_progress:.1f}% actual progress) with low risk indicators."
+
+        ranked_items.append({
+            "rank": rank,
+            "id": p.id,
+            "code": p.code,
+            "name": p.name,
+            "category": p.category,
+            "location": p.location,
+            "project_cost": p.project_cost,
+            "risk_level": p.risk_level,
+            "health_score": p.health_score,
+            "actual_progress": p.actual_progress,
+            "planned_progress": p.planned_progress,
+            "progress_lag": round(lag, 1),
+            "predicted_delay_months": p.predicted_delay_months,
+            "predicted_cost_overrun_percentage": p.predicted_cost_overrun_percentage,
+            "contractor_performance": p.contractor_performance,
+            "priority_score": score,
+            "priority_label": priority_label,
+            "delay_impact": delay_impact,
+            "cost_impact": cost_impact,
+            "explanation": explanation
+        })
+
+    return ranked_items
+
+
+@router.get("/intervention-priority")
+def get_intervention_priority_endpoint(db: Session = Depends(get_db)):
+    projects = db.query(Project).all()
+    return compute_intervention_priority(projects)
+

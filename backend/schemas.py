@@ -137,6 +137,7 @@ class DashboardStats(BaseModel):
     cost_vs_progress: List[Dict[str, Any]]
     projects_requiring_attention: List[Dict[str, Any]]
     recent_analyses: List[Dict[str, Any]]
+    intervention_priority: List[Dict[str, Any]] = []
 
 class AlertResponse(BaseModel):
     id: int

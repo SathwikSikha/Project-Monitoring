@@ -36,6 +36,7 @@ export default function Dashboard({ onSelectProject, onNavigateToProjects, onNav
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showAllPriority, setShowAllPriority] = useState(false);
 
   const fetchStats = async () => {
     try {
@@ -277,6 +278,140 @@ export default function Dashboard({ onSelectProject, onNavigateToProjects, onNav
           </div>
         </div>
       </div>
+
+      {/* Recommended Intervention Priority Ranking Section */}
+      {stats.intervention_priority && stats.intervention_priority.length > 0 && (
+        <div className="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden space-y-0">
+          <div className="p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30 uppercase tracking-wider">
+                  Decision Support Engine
+                </span>
+                <span className="text-xs text-slate-400 font-mono">
+                  {stats.intervention_priority.length} Projects Analyzed &amp; Ranked
+                </span>
+              </div>
+              <h3 className="text-lg font-extrabold text-white tracking-tight mt-1 flex items-center gap-2">
+                <span>Recommended Intervention Priority</span>
+              </h3>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Projects ranked by urgency and potential impact to prioritize immediate monitoring &amp; executive intervention.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowAllPriority(!showAllPriority)}
+                className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition shadow-sm"
+              >
+                {showAllPriority ? "Show Top Priority Only" : `View Full Ranking (${stats.intervention_priority.length} Projects)`}
+              </button>
+            </div>
+          </div>
+
+          <div className="divide-y divide-slate-100">
+            {(showAllPriority
+              ? stats.intervention_priority
+              : stats.intervention_priority.slice(0, 6)
+            ).map((proj) => (
+              <div
+                key={proj.id}
+                className="p-4 sm:p-5 hover:bg-slate-50/80 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
+              >
+                {/* Rank & Main Metadata */}
+                <div className="flex items-start gap-3.5 flex-1">
+                  {/* Rank Badge */}
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shrink-0 shadow-sm ${
+                    proj.rank === 1
+                      ? 'bg-red-600 text-white ring-4 ring-red-100'
+                      : proj.rank === 2
+                      ? 'bg-orange-500 text-white ring-2 ring-orange-100'
+                      : proj.rank === 3
+                      ? 'bg-amber-500 text-white ring-2 ring-amber-100'
+                      : 'bg-slate-800 text-slate-200'
+                  }`}>
+                    #{proj.rank}
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => onSelectProject(proj.id)}
+                        className="font-bold text-slate-900 hover:text-blue-600 text-sm text-left transition"
+                      >
+                        {proj.name}
+                      </button>
+                      <span className="text-[10px] text-slate-400 font-mono font-medium">
+                        {proj.code}
+                      </span>
+                      <span className="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold">
+                        {proj.category}
+                      </span>
+                    </div>
+
+                    {/* Priority Badge & Short Explanation */}
+                    <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                      <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                        proj.priority_label === 'Immediate Intervention'
+                          ? 'bg-red-100 text-red-800 border border-red-200'
+                          : proj.priority_label === 'High Attention'
+                          ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                          : proj.priority_label === 'Moderate Priority'
+                          ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                          : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                      }`}>
+                        {proj.priority_label}
+                      </span>
+                      <span className="text-xs text-slate-600 italic">
+                        "{proj.explanation}"
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Metrics & Action Button */}
+                <div className="flex flex-wrap items-center justify-between md:justify-end gap-4 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
+                  {/* Priority Score */}
+                  <div className="text-right space-y-0.5">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Priority Score</span>
+                    <div className="flex items-center gap-1 justify-end">
+                      <span className="text-base font-extrabold text-slate-900">{proj.priority_score}</span>
+                      <span className="text-[10px] text-slate-400 font-normal">/100</span>
+                    </div>
+                  </div>
+
+                  {/* Impact Badges */}
+                  <div className="flex items-center gap-2">
+                    <div className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-center min-w-[80px]">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block">Delay Impact</span>
+                      <span className={`text-xs font-extrabold ${proj.delay_impact === 'High' ? 'text-red-600' : proj.delay_impact === 'Medium' ? 'text-amber-600' : 'text-emerald-600'}`}>
+                        {proj.delay_impact} (+{proj.predicted_delay_months}m)
+                      </span>
+                    </div>
+
+                    <div className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-center min-w-[80px]">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block">Cost Impact</span>
+                      <span className={`text-xs font-extrabold ${proj.cost_impact === 'High' ? 'text-red-600' : proj.cost_impact === 'Medium' ? 'text-amber-600' : 'text-emerald-600'}`}>
+                        {proj.cost_impact} (+{proj.predicted_cost_overrun_percentage}%)
+                      </span>
+                    </div>
+                  </div>
+
+                  <RiskBadge level={proj.risk_level} size="sm" />
+
+                  {/* Action Navigation Button */}
+                  <button
+                    onClick={() => onSelectProject(proj.id)}
+                    className="px-3.5 py-1.5 bg-slate-900 text-white hover:bg-blue-600 rounded-lg text-xs font-bold transition shadow-sm"
+                  >
+                    Inspect
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Projects Requiring Immediate Attention Table */}
       <div className="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden space-y-0">

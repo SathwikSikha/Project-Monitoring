@@ -19,6 +19,12 @@ export const api = {
     return res.json();
   },
 
+  async getInterventionPriority() {
+    const res = await fetch(`${API_BASE}/dashboard/intervention-priority`);
+    if (!res.ok) throw new Error('Failed to fetch intervention priority ranking');
+    return res.json();
+  },
+
   // Projects API
   async getProjects(params = {}) {
     const query = new URLSearchParams();
