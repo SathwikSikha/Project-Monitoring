@@ -58,7 +58,7 @@ set "backend_ready=0"
 
 :HEALTHCHECK_LOOP
 timeout /t 1 /nobreak >nul
-powershell -NoProfile -ExecutionPolicy Bypass -Command "try { $r = Invoke-RestMethod -Uri 'http://127.0.0.1:8000/health' -TimeoutSec 2; if ($r.status -eq 'healthy') { exit 0 } else { exit 1 } } catch { exit 1 }" >nul 2>&1
+python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)" >nul 2>&1
 if %errorlevel% equ 0 (
     set "backend_ready=1"
     goto HEALTHCHECK_SUCCESS
@@ -104,7 +104,7 @@ set /a fe_max=10
 
 :FE_HEALTHCHECK_LOOP
 timeout /t 1 /nobreak >nul
-powershell -NoProfile -ExecutionPolicy Bypass -Command "try { $r = Invoke-WebRequest -Uri 'http://localhost:5173' -TimeoutSec 2; if ($r.StatusCode -eq 200) { exit 0 } else { exit 1 } } catch { exit 1 }" >nul 2>&1
+python -c "import urllib.request; urllib.request.urlopen('http://localhost:5173', timeout=2)" >nul 2>&1
 if %errorlevel% equ 0 (
     goto FE_SUCCESS
 )
