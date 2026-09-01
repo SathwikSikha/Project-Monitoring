@@ -11,12 +11,7 @@ export default function Navbar({ unreadAlertsCount = 0, onNavigateToAlerts }) {
             <Activity className="w-5 h-5" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-black tracking-wider text-slate-900 font-sans">PAIMANA</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wider">
-                SIH 2026 Prototype
-              </span>
-            </div>
+            <span className="text-xl font-black tracking-wider text-slate-900 font-sans">Traxis</span>
             <p className="text-xs text-slate-500 font-medium">
               Project Assessment, Intelligence, Monitoring & Analytics
             </p>
@@ -44,17 +39,6 @@ export default function Navbar({ unreadAlertsCount = 0, onNavigateToAlerts }) {
               </span>
             )}
           </button>
-
-          {/* User Badge */}
-          <div className="flex items-center gap-2.5 pl-3 border-l border-slate-200">
-            <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold shadow-sm">
-              GOI
-            </div>
-            <div className="hidden sm:block text-left">
-              <p className="text-xs font-bold text-slate-800 leading-tight">Infrastructure Cell</p>
-              <p className="text-[10px] text-slate-400 font-medium">Monitoring Authority</p>
-            </div>
-          </div>
         </div>
       </div>
     </header>

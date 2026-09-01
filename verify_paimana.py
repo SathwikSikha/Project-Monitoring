@@ -64,4 +64,4 @@ for idx, rec in enumerate(result['recommendations'][:3], 1):
 print("\n=== 4. CHECKING FRONTEND BUILD ASSETS ===")
 assert os.path.exists("frontend/dist/index.html"), "Frontend build index.html missing"
 print("Frontend production build verified in frontend/dist/")
-print("\n>>> ALL PAIMANA SYSTEM INTEGRITY TESTS PASSED! <<<")
+print("\n>>> ALL TRAXIS SYSTEM INTEGRITY TESTS PASSED! <<<")

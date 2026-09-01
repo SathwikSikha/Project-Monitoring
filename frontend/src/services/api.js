@@ -1,5 +1,5 @@
 /**
- * PAIMANA Frontend API Service
+ * Traxis Frontend API Service
  * Centralized API client communicating with FastAPI backend
  *
  * In development: uses Vite's proxy (VITE_API_URL is undefined → '/api')

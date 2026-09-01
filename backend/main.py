@@ -1,5 +1,5 @@
 """
-PAIMANA - Project Assessment, Intelligence, Monitoring & Analytics
+Traxis - Project Assessment, Intelligence, Monitoring & Analytics
 FastAPI Backend Application Entrypoint
 """
 
@@ -15,8 +15,8 @@ from .models import Project
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="PAIMANA API",
-    description="AI-Powered Infrastructure Project Monitoring & Risk Prediction Platform (SIH 2026)",
+    title="Traxis API",
+    description="AI-Powered Infrastructure Project Monitoring & Risk Prediction Platform",
     version="1.0.0"
 )
 
@@ -58,18 +58,17 @@ def startup_event():
 @app.get("/")
 def root():
     return {
-        "platform": "PAIMANA",
+        "platform": "Traxis",
         "tagline": "AI-Powered Infrastructure Project Monitoring & Risk Prediction",
         "status": "online",
         "version": "1.0.0",
         "docs_url": "/docs",
-        "hackathon": "Smart India Hackathon (SIH) 2026"
     }
 
 @app.get("/health")
 @app.get("/api/health")
 def health_check():
-    return {"status": "healthy", "service": "PAIMANA Backend API"}
+    return {"status": "healthy", "service": "Traxis Backend API"}
 
 if __name__ == "__main__":
     import uvicorn

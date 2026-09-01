@@ -17,7 +17,7 @@ export default function About() {
   const fourQuestions = [
     {
       q: '1. What is happening with the project?',
-      a: 'PAIMANA ingests multi-dimensional telemetry (physical progress vs baseline, expenditure rate, contractor score, supply chain uptime) into a unified Health Index.',
+      a: 'Traxis ingests multi-dimensional telemetry (physical progress vs baseline, expenditure rate, contractor score, supply chain uptime) into a unified Health Index.',
       color: 'border-blue-500 bg-blue-50/50 text-blue-900'
     },
     {
@@ -47,14 +47,9 @@ export default function About() {
     <div className="p-6 sm:p-8 space-y-8 max-w-7xl mx-auto">
       {/* Page Header */}
       <div className="pb-4 border-b border-slate-200">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            About PAIMANA Platform
-          </h1>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200 uppercase">
-            SIH 2026
-          </span>
-        </div>
+        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          About Traxis Platform
+        </h1>
         <p className="text-sm text-slate-500 mt-1">
           Project Assessment, Intelligence, Monitoring & Analytics — Decision Support System for Mega Infrastructure.
         </p>
@@ -79,7 +74,7 @@ export default function About() {
         <div>
           <h3 className="text-base font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
             <HelpCircle size={18} className="text-blue-600" />
-            <span>The Four Core Questions Answered by PAIMANA</span>
+            <span>The Four Core Questions Answered by Traxis</span>
           </h3>
           <p className="text-xs text-slate-500">
             Translating complex engineering telemetry into proactive decision intelligence.

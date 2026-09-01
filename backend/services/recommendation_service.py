@@ -1,5 +1,5 @@
 """
-PAIMANA - AI Prescriptive Recommendation Engine
+Traxis - AI Prescriptive Recommendation Engine
 Generates context-aware, prioritized actionable interventions mapped to specific project root-cause risk factors.
 """
 
@@ -112,7 +112,7 @@ def generate_recommendations(
             "title": "Establish High-Frequency Daily Milestone War-Room",
             "action": "Implement IoT sensor telemetry, drone survey progress verification, and daily automated dashboard tracking for lagging milestones.",
             "impact": "Provides transparent ground-truth validation and immediate bottleneck detection.",
-            "owner": "Digital Monitoring Unit (PAIMANA)"
+            "owner": "Digital Monitoring Unit (Traxis)"
         })
 
     # Baseline healthy recommendation if low risk

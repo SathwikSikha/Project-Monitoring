@@ -1,5 +1,5 @@
 """
-PAIMANA - Database Seeder
+Traxis - Database Seeder
 Seeds SQLite database with 18 highly realistic Indian infrastructure projects
 spanning High-Speed Rail, Expressways, Metros, Bridges, Mega Airports, Irrigation, Urban Water & Solar Utilities.
 Includes realistic mixtures of LOW, MEDIUM, HIGH, and CRITICAL risk profiles.

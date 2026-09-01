@@ -45,7 +45,7 @@ export default function Dashboard({ onSelectProject, onNavigateToProjects, onNav
       setStats(data);
     } catch (err) {
       console.error(err);
-      setError('Unable to connect to PAIMANA Backend API. Ensure backend is running.');
+      setError('Unable to connect to Traxis Backend API. Ensure backend is running.');
     } finally {
       setLoading(false);
     }

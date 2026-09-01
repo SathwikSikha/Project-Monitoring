@@ -1,5 +1,5 @@
 """
-PAIMANA - Prediction Service & Explainability Engine
+Traxis - Prediction Service & Explainability Engine
 Loads trained RandomForest models, performs live inference, computes transparent health scores,
 identifies dynamic root-cause risk factors, and calculates 1-6 month future trajectory projections.
 """
@@ -37,11 +37,11 @@ class PredictionEngine:
                 self.cost_model = joblib.load(cost_path)
                 self.metadata = joblib.load(meta_path)
                 self.is_loaded = True
-                print("PAIMANA Prediction Engine: ML Models loaded successfully.")
+                print("Traxis Prediction Engine: ML Models loaded successfully.")
             else:
-                print("PAIMANA Prediction Engine: Model files not yet found on disk. Will load upon training.")
+                print("Traxis Prediction Engine: Model files not yet found on disk. Will load upon training.")
         except Exception as e:
-            print(f"PAIMANA Prediction Engine loading error: {e}")
+            print(f"Traxis Prediction Engine loading error: {e}")
             self.is_loaded = False
 
     def ensure_models_loaded(self):

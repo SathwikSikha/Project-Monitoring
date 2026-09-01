@@ -78,8 +78,7 @@ export default function Sidebar({ activeTab, setActiveTab, unreadAlertsCount = 0
 
       {/* Footer Version */}
       <div className="pt-4 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between px-2">
-        <span>PAIMANA v1.0.0</span>
-        <span className="text-blue-400 font-mono font-medium">SIH-2026</span>
+        <span>Traxis v1.0.0</span>
       </div>
     </aside>
   );
